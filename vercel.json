@@ -1,0 +1,6 @@
+{
+  "regions": ["cdg1"],
+  "headers": [
+    { "source": "/", "headers": [{ "key": "cache-control", "value": "no-store" }] }
+  ]
+}

